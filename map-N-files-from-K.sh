@@ -47,6 +47,11 @@ STOP=$(($START + $1 - 1))
 # each sample in order to mark duplicates in it, etc.
 SM_TAGS=$(awk -v low=$START -v high=$STOP '$1 >= low && $1 <= high {print $5}' chinook-fastq-meta-data.tsv | uniq)
 
+#SM_TAGS method: Define variables low and high to be index of first and last files. 
+#               For all lines whose index (first elelement in table chinook-fastq-meta-data.tsv) is >= low and <= high, print the sample name (5th element in each row).
+#               Return each sample name only once (remove duplicate instances of sample names)
+
+
 # loop over those file indexes and do the alignment steps on all of them.
 # NOTE: If you want to test the lines inside the loop just set Idx=5 (for example)
 # on the command line and then run through the lines within the for loop.
@@ -59,9 +64,13 @@ for((Idx=$START; Idx<=$STOP; Idx++)); do
   # file and makes a command line that sets shell variables named after the column
   # headers in the file to their appropriate values:
   ASSIGNMENTS=$(awk -v LINE=$Idx '
-    $1 == "index" {for(i=1; i<=NF; i++) vars[i]=$i; next}
+    $1 == "index" {for(i=1; i<=NF; i++) vars[i]=$i; next} 
     $1 == LINE {for(i=1; i<=NF; i++) printf("%s=%s; ", vars[i], $i)}
   ' chinook-fastq-meta-data.tsv)
+  
+  # ASSIGNMENTS method: Define variable LINE to be the file index that this loop is iterating over
+  #                     Select the very first row of chinook-fastq-meta-data (where the first element is index) and keep all of those column names as an entry in object "vars"
+  #                     Select the row where the first elelement (index) equals LINE, for each element in that line, print "column name=element; "
   
   # then we have to eval the assignments in that command line:
   eval $ASSIGNMENTS

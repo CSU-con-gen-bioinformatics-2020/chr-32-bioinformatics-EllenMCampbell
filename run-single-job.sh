@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 #SBATCH --time=05:00:00
 #SBATCH --output=run-single-out-%j
